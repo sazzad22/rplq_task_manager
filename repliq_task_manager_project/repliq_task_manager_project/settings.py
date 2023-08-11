@@ -142,3 +142,8 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'task_manager_app.CustomUser'
+
+AUTHENTICATION_BACKENDS = [
+    'task_manager_app.backend.CustomUserBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]

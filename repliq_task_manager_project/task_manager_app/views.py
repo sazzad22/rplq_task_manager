@@ -4,10 +4,11 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import IsAuthenticated
 
-from .models import Company
-from .serializers import CustomUserSerializer,CompanySerializer
+from .models import Company,Employee,Assignment,Device
+from .serializers import CustomUserSerializer,CompanySerializer,EmployeeSerializer
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]  # Allow anyone to register
@@ -19,7 +20,8 @@ class UserRegistrationView(APIView):
         
         try:
             company = Company.objects.get(name=data['company_name'])
-        except company.DoesNotExist:
+            
+        except Exception as e:
             return Response({'message':"company not found"}, status=status.HTTP_400_BAD_REQUEST)
         data['company_name'] = company.pk
         
@@ -44,8 +46,8 @@ class UserLoginView(APIView):
         password = request.data.get('password')
 
         if email and password:
-            user = authenticate(email=email, password=password)
-
+            user = authenticate(request,email=email, password=password)
+            print("user login view",user)
             if user:
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
@@ -58,7 +60,7 @@ class UserLoginView(APIView):
 
             return Response({
                     'message':'unauthorized'
-                },status=status.HTTP_200_OK)
+                },status=status.HTTP_401_UNAUTHORIZED)
             
 
 
@@ -104,3 +106,47 @@ def company_view(request, pk=None):
 
         company.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def employee_view(request, pk=None):
+    if request.method == 'GET':
+        if pk is None:
+            employees = Employee.objects.all()
+            serializer = EmployeeSerializer(employees, many=True)
+            return Response(serializer.data)
+        else:
+            try:
+                employee = Employee.objects.get(pk=pk)
+                serializer = EmployeeSerializer(employee)
+                return Response(serializer.data)
+            except Employee.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+    elif request.method == 'POST':
+        serializer = EmployeeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PUT':
+        try:
+            employee = Employee.objects.get(pk=pk)
+        except Employee.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = EmployeeSerializer(employee, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        try:
+            employee = Employee.objects.get(pk=pk)
+            employee.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Employee.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

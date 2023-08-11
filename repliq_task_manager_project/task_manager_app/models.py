@@ -25,7 +25,7 @@ class CustomUser(AbstractBaseUser):
     REQUIRED_FIELDS = ['company_name']
 
     def __str__(self):
-        return self.email,self.company_name
+        return self.email
 
 
 
@@ -50,10 +50,9 @@ class Assignment(models.Model):
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     assigned_date = models.DateField()
     return_date = models.DateField(null=True, blank=True)
-    condition_at_assignment = models.CharField(max_length=100)
     
 
-class Log(models.Model):
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
-    log_date = models.DateTimeField(auto_now_add=True)
-    condition = models.CharField(max_length=100)
+# class Log(models.Model):
+#     device = models.ForeignKey(Device, on_delete=models.CASCADE)
+#     log_date = models.DateTimeField(auto_now_add=True)
+#     condition = models.CharField(max_length=100)
