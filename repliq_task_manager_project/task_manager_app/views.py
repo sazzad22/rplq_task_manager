@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Company,Employee,Assignment,Device
-from .serializers import CustomUserSerializer,CompanySerializer,EmployeeSerializer,DeviceSerializer
+from .serializers import CustomUserSerializer,CompanySerializer,EmployeeSerializer,DeviceSerializer,AssignmentSerializer
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]  # Allow anyone to register
