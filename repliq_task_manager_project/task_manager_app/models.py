@@ -6,9 +6,15 @@ from .user_manager import CustomUserManager
 # Create your models here.
 
 
+class Company(models.Model):
+    name = models.CharField(max_length=100,unique=True)
+    location = models.CharField(max_length=100)
+    contact_info = models.CharField(max_length=200)
+
+
 class CustomUser(AbstractBaseUser):
     email = models.EmailField(unique=True)
-    company_name = models.CharField(max_length=100)
+    company_name = models.ForeignKey(Company,on_delete=models.SET_NULL,null=True,blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -22,10 +28,7 @@ class CustomUser(AbstractBaseUser):
         return self.email,self.company_name
 
 
-class Company(models.Model):
-    name = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
-    contact_info = models.CharField(max_length=200)
+
     
 
 class Employee(models.Model):
