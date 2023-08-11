@@ -29,3 +29,15 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = ['id', 'company', 'name', 'position', 'contact_info']
         read_only_fields = ['id']
         
+        
+class DeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Device
+        fields = '__all__'
+        read_only_fields = ['id']
+        
+
+class AssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assignment
+        fields = '__all__'

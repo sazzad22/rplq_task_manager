@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Company,Employee,Assignment,Device
-from .serializers import CustomUserSerializer,CompanySerializer,EmployeeSerializer
+from .serializers import CustomUserSerializer,CompanySerializer,EmployeeSerializer,DeviceSerializer
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]  # Allow anyone to register
@@ -150,3 +150,93 @@ def employee_view(request, pk=None):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Employee.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def devices(request, pk=None):
+    if request.method == 'GET':
+        if pk is None:
+            devices = Device.objects.all()
+            serializer = DeviceSerializer(devices, many=True)
+            return Response(serializer.data)
+        else:
+            try:
+                device = Device.objects.get(pk=pk)
+                serializer = DeviceSerializer(device)
+                return Response(serializer.data)
+            except Device.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+    elif request.method == 'POST':
+        serializer = DeviceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PUT':
+        try:
+            device = Device.objects.get(pk=pk)
+        except Device.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = DeviceSerializer(device, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        try:
+            device = Device.objects.get(pk=pk)
+        except Device.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        device.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def assignments(request, pk=None):
+    if request.method == 'GET':
+        if pk is None:
+            assignments = Assignment.objects.all()
+            serializer = AssignmentSerializer(assignments, many=True)
+            return Response(serializer.data)
+        else:
+            try:
+                assignment = Assignment.objects.get(pk=pk)
+                serializer = AssignmentSerializer(assignment)
+                return Response(serializer.data)
+            except Assignment.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+    elif request.method == 'POST':
+        serializer = AssignmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PUT':
+        try:
+            assignment = Assignment.objects.get(pk=pk)
+        except Assignment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AssignmentSerializer(assignment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        try:
+            assignment = Assignment.objects.get(pk=pk)
+        except Assignment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        assignment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

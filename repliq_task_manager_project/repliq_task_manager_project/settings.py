@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     # my app
     'task_manager_app',
+    'assignments_app',
 ]
 
 MIDDLEWARE = [
